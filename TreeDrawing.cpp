@@ -382,6 +382,23 @@ namespace {
     }
 }
 
+/* Drawing in a window fills the window. */
+void TreeDrawing::draw(GWindow& window) const {
+    draw(window, {
+             0, 0,
+             window.getCanvasWidth(),
+             window.getCanvasHeight()
+         });
+}
+
+/* Drawing in a canvas fills the canvas. */
+void TreeDrawing::draw(GCanvas* canvas) const {
+    draw(canvas, {
+             0, 0, canvas->getWidth(), canvas->getHeight()
+         });
+}
+
+/* To draw inside a window, draw in its canvas. */
 void TreeDrawing::draw(GWindow& window, const GRectangle& bounds) const {
     draw(window.getCanvas(), bounds);
 }
@@ -394,6 +411,7 @@ void TreeDrawing::draw(GCanvas* canvas, const GRectangle& bounds) const {
     /* No tree? No problem! Just don't draw anything. */
     if (!root_) return;
 
+    /* Figure out the aspect ratio and bounds to use. */
     double width  = bounds.width;
     double height = bounds.height;
 
