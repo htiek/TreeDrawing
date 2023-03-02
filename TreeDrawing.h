@@ -98,6 +98,8 @@ private:
     /* Detects whether the given type has left and right fields. */
     template <typename NodeType> struct HasLeftRightFields {
     private:
+        typedef typename std::remove_cv<NodeType>::type CoreNode;
+
         /* These types must have different sizes. */
         struct Yes {
             char buffer[137];
@@ -118,22 +120,22 @@ private:
         template <typename U> static Yes check(
             typename AreEqual<
                 typename std::remove_reference<decltype(std::declval<U>().*&U::left)>::type,
-                NodeType*
+                CoreNode*
             >::result
         );
         template <typename U> static No  check(...);
 
     public:
         static constexpr bool value
-            = std::is_same<decltype(check<NodeType>(0)), Yes>::value;
+            = std::is_same<decltype(check<CoreNode>(0)), Yes>::value;
     };
 
     /* Left/right accessor function. */
-    template <typename NodeType> NodeType* defaultLeft(NodeType* root) {
+    template <typename NodeType> static NodeType* defaultLeft(NodeType* root) {
         static_assert(HasLeftRightFields<NodeType>::value, "Tree type must have fields named 'left' and 'right' that point to its children. If you want to override this behavior, use makeDrawingOf and specify the names of the child pointers.");
         return root->left;
     }
-    template <typename NodeType> NodeType* defaultRight(NodeType* root) {
+    template <typename NodeType> static NodeType* defaultRight(NodeType* root) {
         static_assert(HasLeftRightFields<NodeType>::value, "Tree type must have fields named 'left' and 'right' that point to its children. If you want to override this behavior, use makeDrawingOf and specify the names of the child pointers.");
         return root->right;
     }
@@ -307,7 +309,7 @@ private:
     double nodeRadius_;
 
     /* Bounding box for all nodes. */
-    GRectangle bounds_;
+    GRectangle bounds_{0, 0, 0, 0};
 };
 
 /* * * * * Implementation Below This POint * * * * */
